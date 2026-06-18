@@ -1,0 +1,2266 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>BGP Signed Origin Delegation Attestation (SODA)</title>
+<meta content="Shenglin Jiang" name="author">
+<meta content="Ke Xu" name="author">
+<meta content="Zhuotao Liu" name="author">
+<meta content="Xiaoliang Wang" name="author">
+<meta content="
+       This document defines BGP Signed Origin Delegation Attestation (SODA),
+an optional transitive BGP path attribute that carries a signed
+authorization, issued by the holder of an IP prefix, delegating
+origination of that prefix to a specified Autonomous System (AS) until a
+stated expiry time. Using SODA, a validator performing Route Origin
+Validation (ROV) can determine whether an ROV-Invalid result reflects an
+authorized delegation rather than a route hijack. 
+    " name="description">
+<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="draft-jiang-idr-bgp-soda-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.8.1
+-->
+<link href="draft-jiang-idr-bgp-soda.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">BGP SODA</td>
+<td class="right">June 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Jiang, et al.</td>
+<td class="center">Expires 20 December 2026</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Inter-Domain Routing</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-jiang-idr-bgp-soda-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-06-18" class="published">18 June 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Standards Track</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2026-12-20">20 December 2026</time></dd>
+<dt class="label-authors">Authors:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">S. Jiang</div>
+<div class="org">Zhongguancun Laboratory</div>
+</div>
+<div class="author">
+      <div class="author-name">K. Xu</div>
+<div class="org">Tsinghua University</div>
+</div>
+<div class="author">
+      <div class="author-name">Z. Liu</div>
+<div class="org">Tsinghua University</div>
+</div>
+<div class="author">
+      <div class="author-name">X. Wang</div>
+<div class="org">Tsinghua University</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">BGP Signed Origin Delegation Attestation (SODA)</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document defines BGP Signed Origin Delegation Attestation (SODA),
+an optional transitive BGP path attribute that carries a signed
+authorization, issued by the holder of an IP prefix, delegating
+origination of that prefix to a specified Autonomous System (AS) until a
+stated expiry time. Using SODA, a validator performing Route Origin
+Validation (ROV) can determine whether an ROV-Invalid result reflects an
+authorized delegation rather than a route hijack.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-discussion-venues">
+<a href="#name-discussion-venues" class="section-name selfRef">Discussion Venues</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">Discussion of this document takes place on the
+    Inter-Domain Routing Working Group mailing list (idr@ietf.org),
+    which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/idr/">https://mailarchive.ietf.org/arch/browse/idr/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">Source for this draft and an issue tracker can be found at
+    <span><a href="https://github.com/shenglinwh/bgp-soda">https://github.com/shenglinwh/bgp-soda</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 20 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-design-rationale" class="internal xref">Design Rationale</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-why-an-in-band-attribute-ra" class="internal xref">Why an In-Band Attribute Rather Than a Published Object</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-relationship-to-publishing-" class="internal xref">Relationship to Publishing an Additional ROA</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-deployment-considerations" class="internal xref">Deployment Considerations</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-the-route_delegation_attest" class="internal xref">The ROUTE_DELEGATION_ATTEST Attribute</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-overview" class="internal xref">Overview</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-attribute-format" class="internal xref">Attribute Format</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-signed-data" class="internal xref">Signed Data</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-operational-procedures" class="internal xref">Operational Procedures</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-delegator-procedures" class="internal xref">Delegator Procedures</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-delegatee-procedures" class="internal xref">Delegatee Procedures</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-validation-procedure" class="internal xref">Validation Procedure</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-phase-1-route-origin-valida" class="internal xref">Phase 1: Route Origin Validation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-phase-2-soda-fallback-valid" class="internal xref">Phase 2: SODA Fallback Validation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-local-policy" class="internal xref">Local Policy</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-relationship-to-existing-me" class="internal xref">Relationship to Existing Mechanisms</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-scope-of-delegator-authorit" class="internal xref">Scope of Delegator Authority</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-stale-route-window" class="internal xref">Stale Route Window</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-bgpsec-key-compromise" class="internal xref">BGPsec Key Compromise</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
+                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-replay-of-valid-soda-attrib" class="internal xref">Replay of Valid SODA Attributes</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5">
+                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-removal-of-the-attribute" class="internal xref">Removal of the Attribute</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.6">
+                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-computational-cost-and-deni" class="internal xref">Computational Cost and Denial of Service</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.7">
+                <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="auto internal xref">8.7</a>.  <a href="#name-path-validation" class="internal xref">Path Validation</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-bgp-path-attribute-type-cod" class="internal xref">BGP Path Attribute Type Code</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-soda-signature-algorithm-id" class="internal xref">SODA Signature Algorithm Identifiers</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgements" class="internal xref">Acknowledgements</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">The Resource Public Key Infrastructure (RPKI) <span>[<a href="#RFC6480" class="cite xref">RFC6480</a>]</span> and Route
+Origin Authorizations (ROAs) <span>[<a href="#RFC9582" class="cite xref">RFC9582</a>]</span> provide the foundation for
+Route Origin Validation (ROV) <span>[<a href="#RFC6811" class="cite xref">RFC6811</a>]</span>. A ROA authorizes a single
+Autonomous System (AS) to originate routes for one or more specified IP
+prefixes. When a BGP speaker performs ROV on a received UPDATE, a route
+whose origin AS is not authorized by a covering ROA is classified as
+Invalid.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">ROV is effective at detecting unauthorized route origination. However,
+an Invalid result does not necessarily indicate a route hijack. In
+operational practice, a prefix holder may authorize another AS to
+originate routes on its behalf without directly modifying the
+corresponding ROA. Such arrangements arise in a variety of scenarios,
+including address leasing, outsourced routing services, DDoS mitigation,
+content delivery networks, and other forms of delegated route
+origination <span>[<a href="#IMC2024" class="cite xref">IMC2024</a>]</span><span>[<a href="#NDSS2026" class="cite xref">NDSS2026</a>]</span><span>[<a href="#Oakland26" class="cite xref">Oakland26</a>]</span>.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">Although a prefix holder could authorize a delegatee by creating an
+additional ROA, doing so requires modifying the global RPKI repository
+state and may be operationally undesirable for short-lived, dynamic, or
+frequently changing delegations. Furthermore, ROAs are designed to
+express route origination authorization rather than explicit delegation
+relationships between a resource holder and a delegatee.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">As a result, ROV alone cannot distinguish between a route hijack and a
+route originated by an AS that has been legitimately authorized through
+an out-of-band delegation arrangement. Both cases produce the same
+ROV-Invalid outcome.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">This document defines the BGP Signed Origin Delegation Attestation
+(SODA), an optional transitive BGP path attribute named
+ROUTE_DELEGATION_ATTEST. The attribute carries a cryptographically
+signed delegation statement, issued by a prefix holder, authorizing a
+specified AS to originate a prefix until a stated expiration time.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">When standard ROV produces an Invalid result, a validator may evaluate
+the SODA attribute to determine whether the route represents a
+legitimate delegation rather than an unauthorized origination. SODA
+therefore complements existing RPKI-based origin validation while
+preserving the existing ROV trust model.<a href="#section-1-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="conventions-and-definitions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="design-rationale">
+<section id="section-3">
+      <h2 id="name-design-rationale">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-design-rationale" class="section-name selfRef">Design Rationale</a>
+      </h2>
+<p id="section-3-1">This section explains two design choices that are central to SODA and
+that distinguish it from the obvious alternatives: carrying the
+delegation authorization in band, as a BGP path attribute, rather than as
+a published RPKI object; and introducing a new mechanism at all, rather
+than expecting prefix holders to publish an additional ROA. These choices
+also bound the situations in which SODA is the appropriate tool.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<div id="why-an-in-band-attribute-rather-than-a-published-object">
+<section id="section-3.1">
+        <h3 id="name-why-an-in-band-attribute-ra">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-why-an-in-band-attribute-ra" class="section-name selfRef">Why an In-Band Attribute Rather Than a Published Object</a>
+        </h3>
+<p id="section-3.1-1">The authorization that SODA conveys could in principle be expressed as a
+new RPKI signed object, published to a repository and fetched by relying
+parties, in the manner of ROAs <span>[<a href="#RFC9582" class="cite xref">RFC9582</a>]</span>. SODA instead carries the
+authorization in the BGP UPDATE that announces the delegated route. This
+choice is motivated by the properties of the delegations that SODA
+targets: short-lived, dynamic, or frequently changing arrangements such
+as address leasing, outsourced routing, DDoS mitigation, and content
+delivery <span>[<a href="#IMC2024" class="cite xref">IMC2024</a>]</span><span>[<a href="#NDSS2026" class="cite xref">NDSS2026</a>]</span><span>[<a href="#Oakland26" class="cite xref">Oakland26</a>]</span>.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">A repository-published object becomes usable only after it has been
+published at the issuer's publication point, fetched by relying parties
+on their polling cycle, validated, and distributed to routers. The
+resulting end-to-end delay is independent of BGP propagation and can be
+substantial relative to the lifetime of an ephemeral delegation. An
+in-band attribute, by contrast, travels with the route: the authorization
+and the announcement arrive together and converge at BGP speed. For a
+delegation whose intended lifetime is comparable to, or shorter than,
+repository convergence latency, in-band delivery is the property that
+makes the authorization useful at all.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">In-band delivery also binds the authorization to a specific announcement.
+A published object is global and standalone: it authorizes the delegatee
+to originate the prefix toward every relying party, for the object's
+entire validity period, independent of whether any corresponding route is
+being announced. The SODA attribute exists only while the delegatee
+announces the route, propagates only as far as the route propagates, and
+is scoped to the prefix and the AS pair carried in the UPDATE. The
+lifetime and reach of the authorization in the routing system therefore
+track the lifetime and reach of the route itself, rather than persisting
+in global state after the delegation has ended.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">These benefits come at a cost, which this document does not minimize.
+In-band delivery requires that the validating AS implement SODA in order
+to obtain any benefit (see <a href="#deployment" class="auto internal xref">Section 3.3</a>), and it places signature
+verification on, or adjacent to, the BGP processing path, with an
+associated denial-of-service surface that is discussed in <a href="#dos" class="auto internal xref">Section 8.6</a>. SODA
+further relies on the existing RPKI and on BGPsec
+router certificates <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>; it introduces no new public key
+infrastructure.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="relationship-to-publishing-an-additional-roa">
+<section id="section-3.2">
+        <h3 id="name-relationship-to-publishing-">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-relationship-to-publishing-" class="section-name selfRef">Relationship to Publishing an Additional ROA</a>
+        </h3>
+<p id="section-3.2-1">A prefix holder can already authorize a second origin AS by publishing an
+additional ROA <span>[<a href="#RFC9582" class="cite xref">RFC9582</a>]</span>. Where the delegation is long-lived and
+stable, this is the appropriate tool, and operators <span class="bcp14">SHOULD</span> publish a ROA
+rather than rely on SODA: a ROA is honored by every relying party that
+performs ROV today, requires no new attribute support in the data path,
+and is the mechanism the RPKI is designed to provide.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">SODA targets the cases in which publishing a ROA is, by the prefix
+holder's own choice, undesirable or insufficiently timely: delegations
+that are too short-lived, too dynamic, or too numerous to be reflected in
+the global repository without unacceptable churn or latency. In these
+cases the relevant baseline is not "a ROA that already solves the
+problem" but "no additional ROA, and therefore an ROV-Invalid route that
+is discarded everywhere." Against that baseline, SODA is strictly
+additive: at a SODA-aware validator it can recover a legitimately
+delegated route, while at a validator that does not implement SODA the
+route is treated exactly as it is today, namely as ROV-Invalid. SODA does
+not weaken ROV and does not change the outcome for any route that a
+prefix holder would have authorized with a ROA.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="deployment">
+<section id="section-3.3">
+        <h3 id="name-deployment-considerations">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-deployment-considerations" class="section-name selfRef">Deployment Considerations</a>
+        </h3>
+<p id="section-3.3-1">SODA provides benefit only between a delegator that issues attributes and
+a validating AS that evaluates them; an AS that does not implement Phase 2
+(<a href="#phase2" class="auto internal xref">Section 6.2</a>) ignores the attribute and continues to treat the route as
+ROV-Invalid. SODA therefore offers no network-wide benefit from unilateral
+adoption, and its value to a given delegation grows with the number of
+validators on the relevant paths that implement it. This is an inherent
+property of an in-band, endpoint-evaluated mechanism and is the principal
+cost of the design.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">The corresponding failure mode is, however, benign. Because a SODA-Valid
+outcome only ever causes a validator to accept a route that ROV alone
+would have rejected, the absence of SODA support, the removal of the
+attribute in transit (see <a href="#removal" class="auto internal xref">Section 8.5</a>), and the expiry of a delegation can
+each only cause a delegated route to be treated as ROV-Invalid. None of
+these conditions can cause an unauthorized route to be accepted. SODA thus
+fails safe with respect to hijack in every partial-deployment scenario.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">Operators deploying SODA should also account for the cost of evaluating
+attributes attached to ROV-Invalid routes; this denial-of-service surface,
+and the implementation measures that bound it, are discussed in <a href="#dos" class="auto internal xref">Section 8.6</a>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="the-routedelegationattest-attribute">
+<section id="section-4">
+      <h2 id="name-the-route_delegation_attest">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-the-route_delegation_attest" class="section-name selfRef">The ROUTE_DELEGATION_ATTEST Attribute</a>
+      </h2>
+<div id="overview">
+<section id="section-4.1">
+        <h3 id="name-overview">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-overview" class="section-name selfRef">Overview</a>
+        </h3>
+<p id="section-4.1-1">ROUTE_DELEGATION_ATTEST is a new BGP path attribute. Its type code is
+TBD (to be assigned by IANA). It is defined with the following flags:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.1-2.1">
+            <p id="section-4.1-2.1.1">Optional (high-order bit of the Attribute Flags octet set to 1).<a href="#section-4.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.1-2.2">
+            <p id="section-4.1-2.2.1">Transitive (second-high-order bit set to 1).<a href="#section-4.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.1-2.3">
+            <p id="section-4.1-2.3.1">Extended Length (fourth-high-order bit set to 1) to accommodate the
+variable-length signature field.<a href="#section-4.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.1-2.4">
+            <p id="section-4.1-2.4.1">The Partial bit (third-high-order bit) follows standard BGP transitive
+attribute semantics per <span>[<a href="#RFC4271" class="cite xref">RFC4271</a>]</span>.<a href="#section-4.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-4.1-3">The attribute carries a signed statement, issued by the delegator AS,
+authorizing the delegatee AS to originate a specified prefix until a
+stated expiration time.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="attr-format">
+<section id="section-4.2">
+        <h3 id="name-attribute-format">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-attribute-format" class="section-name selfRef">Attribute Format</a>
+        </h3>
+<p id="section-4.2-1">The value field of ROUTE_DELEGATION_ATTEST has the following format (all
+multi-octet values are in network byte order):<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.2-2">
+<pre>
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|    Version    |   Sig-Alg-ID  | Prefix-Length |   MaxLength   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Delegator-ASN                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Delegatee-ASN                         |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Delegation-Expiry                       |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Sig-Length          |      Prefix (octets 1-2)      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Prefix (cont., variable, total 0-16 octets)          |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                      Signature (variable)                     |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</pre><a href="#section-4.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-4.2-3">All fixed-length fields occupy fixed octet offsets. The two
+variable-length fields, Prefix and Signature, appear last: their lengths
+are determined by Prefix-Length and Sig-Length, respectively, both of
+which are carried in the fixed-length portion of the value. A parser
+reads the fixed fields at known offsets, derives the Prefix length from
+Prefix-Length, and then reads the Signature using Sig-Length.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-4.2-4">
+          <dt id="section-4.2-4.1">Version (1 octet):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.2">
+            <p id="section-4.2-4.2.1">The version of the SODA attribute format. This document defines
+Version 1 (value 0x01). Implementations <span class="bcp14">MUST</span> ignore (i.e., not use for
+validation) attributes with unknown Version values, and <span class="bcp14">MUST</span> forward
+them unchanged per transitive attribute semantics.<a href="#section-4.2-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.3">Sig-Alg-ID (1 octet):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.4">
+            <p id="section-4.2-4.4.1">An identifier for the signature algorithm used. This document defines
+the value 0x01 for ECDSA with P-256 and SHA-256, the algorithm suite
+defined for BGPsec in <span>[<a href="#RFC8608" class="cite xref">RFC8608</a>]</span>. Additional values may be registered
+as described in <a href="#iana-algs" class="auto internal xref">Section 9.2</a>. Validators that do not recognize the
+Sig-Alg-ID <span class="bcp14">MUST</span> treat the SODA attribute as invalid.<a href="#section-4.2-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.5">Prefix-Length (1 octet):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.6">
+            <p id="section-4.2-4.6.1">The length, in bits, of the delegated prefix, using the encoding of
+<span>[<a href="#RFC4271" class="cite xref">RFC4271</a>]</span> Section 4.3.<a href="#section-4.2-4.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.7">MaxLength (1 octet):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.8">
+            <p id="section-4.2-4.8.1">The maximum prefix length of routes the delegatee is authorized to
+originate, following the semantics of the maxLength field in
+<span>[<a href="#RFC9582" class="cite xref">RFC9582</a>]</span> Section 3. The value <span class="bcp14">MUST</span> be greater than or equal to
+Prefix-Length and <span class="bcp14">MUST NOT</span> exceed 32 for IPv4 or 128 for IPv6,
+according to the address family of the announced prefix (see Prefix
+below).<a href="#section-4.2-4.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.9">Delegator-ASN (4 octets):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.10">
+            <p id="section-4.2-4.10.1">The 4-octet AS Number of the delegator, i.e., an AS belonging to the
+holder of the delegated prefix. The delegator signs this attribute with
+the private key of its BGPsec router certificate (<span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>). The
+binding between the Delegator-ASN and the prefix, which establishes the
+delegator's authority to delegate origination, is verified as described
+in <a href="#delegator-authority" class="auto internal xref">Section 8.1</a>.<a href="#section-4.2-4.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.11">Delegatee-ASN (4 octets):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.12">
+            <p id="section-4.2-4.12.1">The 4-octet AS Number of the delegatee, i.e., the AS authorized to
+originate routes for the prefix. This value <span class="bcp14">MUST</span> match the origin AS
+in the AS_PATH of the BGP UPDATE carrying this attribute.<a href="#section-4.2-4.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.13">Delegation-Expiry (4 octets):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.14">
+            <p id="section-4.2-4.14.1">The expiry time of this delegation, expressed as a 32-bit unsigned
+integer representing seconds since the Unix epoch (January 1, 1970,
+00:00:00 UTC). This value indicates the end of the intended delegation
+period, independent of the validity period of any RPKI certificate or
+BGPsec router certificate. Validators <span class="bcp14">MUST</span> compare this field against
+the current time during SODA evaluation, as specified in <a href="#phase2" class="auto internal xref">Section 6.2</a>.<a href="#section-4.2-4.14.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.15">Sig-Length (2 octets):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.16">
+            <p id="section-4.2-4.16.1">The length, in octets, of the Signature field. For Sig-Alg-ID 0x01
+(ECDSA P-256), the signature is encoded as a fixed 64-octet value, the
+concatenation of the two 32-octet integers r and s, as specified for
+BGPsec signatures in <span>[<a href="#RFC8608" class="cite xref">RFC8608</a>]</span>.<a href="#section-4.2-4.16.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.17">Prefix (variable, 0-16 octets):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.18">
+            <p id="section-4.2-4.18.1">The IP address prefix to which this delegation applies, encoded as the
+minimum number of octets necessary to represent the Prefix-Length most
+significant bits. Any trailing bits beyond Prefix-Length within the
+final octet <span class="bcp14">MUST</span> be set to zero so that the encoding (and therefore the
+signature) is canonical. IPv4 prefixes require at most 4 octets; IPv6
+prefixes require at most 16 octets. The address family is not carried in
+the attribute; it is taken from the address family of the announced NLRI
+against which the attribute is validated (<a href="#phase2" class="auto internal xref">Section 6.2</a>), and the Prefix
+<span class="bcp14">MUST</span> be interpreted, and the MaxLength bound applied, in that address
+family.<a href="#section-4.2-4.18.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-4.2-4.19">Signature (variable):</dt>
+          <dd style="margin-left: 1.5em" id="section-4.2-4.20">
+            <p id="section-4.2-4.20.1">The digital signature produced by the delegator using the private key
+corresponding to its BGPsec router certificate. The signed data is
+defined in <a href="#signing" class="auto internal xref">Section 4.3</a>.<a href="#section-4.2-4.20.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="signing">
+<section id="section-4.3">
+        <h3 id="name-signed-data">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-signed-data" class="section-name selfRef">Signed Data</a>
+        </h3>
+<p id="section-4.3-1">The signature covers the following fields, concatenated in order without
+any additional framing:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-4.3-2">
+<pre>
+Signed-Data = Version            (1 octet)
+            | Sig-Alg-ID         (1 octet)
+            | Prefix-Length      (1 octet)
+            | MaxLength          (1 octet)
+            | Delegator-ASN      (4 octets)
+            | Delegatee-ASN      (4 octets)
+            | Delegation-Expiry  (4 octets)
+            | Prefix             (variable, canonical, see above)
+</pre><a href="#section-4.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-4.3-3">The Sig-Length and Signature fields are not covered by the signature. The
+signed fields are exactly the value fields in wire order (<a href="#attr-format" class="auto internal xref">Section 4.2</a>)
+with Sig-Length and Signature removed. Including Version and Sig-Alg-ID in
+the signed data binds the format version and the chosen algorithm to the
+signature and prevents version or algorithm substitution.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="operational-procedures">
+<section id="section-5">
+      <h2 id="name-operational-procedures">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-operational-procedures" class="section-name selfRef">Operational Procedures</a>
+      </h2>
+<div id="delegator-procedures">
+<section id="section-5.1">
+        <h3 id="name-delegator-procedures">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-delegator-procedures" class="section-name selfRef">Delegator Procedures</a>
+        </h3>
+<p id="section-5.1-1">A delegator <span class="bcp14">MUST</span> be the holder of the delegated prefix in the RPKI, i.e.,
+the resource holder to whom the prefix is allocated or sub-allocated. The
+delegator's AS and the delegated prefix <span class="bcp14">MUST</span> therefore be covered by a
+common RPKI resource certificate, so that the delegator's authority over
+the prefix can be verified as described in <a href="#delegator-authority" class="auto internal xref">Section 8.1</a>. The
+delegator <span class="bcp14">MUST</span> also hold a BGPsec router certificate for its AS, as
+defined in <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>, whose private key it uses to sign the attribute.
+Authority to delegate origination follows from holding the address space;
+it is distinct from, and stronger than, mere authorization to originate
+the prefix, which a ROA alone conveys.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">To issue a ROUTE_DELEGATION_ATTEST attribute value for a delegation:<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-5.1-3">
+<li id="section-5.1-3.1">
+            <p id="section-5.1-3.1.1">Construct the ROUTE_DELEGATION_ATTEST attribute value as specified in
+<a href="#attr-format" class="auto internal xref">Section 4.2</a>, with the appropriate Delegatee-ASN, Prefix,
+MaxLength, and Delegation-Expiry values.<a href="#section-5.1-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-3.2">
+            <p id="section-5.1-3.2.1">Compute the signature over the Signed-Data as specified in
+<a href="#signing" class="auto internal xref">Section 4.3</a>, using the BGPsec router certificate private key.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-5.1-3.3">
+            <p id="section-5.1-3.3.1">Deliver the signed attribute value to the delegatee via an
+out-of-band channel. The out-of-band delivery protocol is outside the
+scope of this document.<a href="#section-5.1-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-5.1-4">The delegator <span class="bcp14">SHOULD</span> set Delegation-Expiry to a value no later than the
+intended end of the delegation period. The delegator <span class="bcp14">MAY</span> issue a
+replacement ROUTE_DELEGATION_ATTEST attribute value with an updated
+Delegation-Expiry to extend an active delegation.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="delegatee-procedures">
+<section id="section-5.2">
+        <h3 id="name-delegatee-procedures">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-delegatee-procedures" class="section-name selfRef">Delegatee Procedures</a>
+        </h3>
+<p id="section-5.2-1">A delegatee that has received a valid ROUTE_DELEGATION_ATTEST attribute
+value from the delegator <span class="bcp14">SHOULD</span> attach the attribute to BGP UPDATE
+messages for the delegated prefix.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">The delegatee <span class="bcp14">SHOULD</span> cease advertising the ROUTE_DELEGATION_ATTEST
+attribute after the Delegation-Expiry timestamp has passed, and <span class="bcp14">SHOULD</span>
+withdraw the corresponding route unless a renewed attribute value has
+been obtained.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">A delegatee <span class="bcp14">MUST NOT</span> modify the value of a ROUTE_DELEGATION_ATTEST
+attribute received from the delegator; the value <span class="bcp14">MUST</span> be included in BGP
+UPDATE messages exactly as provided by the delegator.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">A delegatee <span class="bcp14">MUST NOT</span> construct a ROUTE_DELEGATION_ATTEST attribute that
+names its own AS as the Delegator-ASN unless it is itself the holder of
+the prefix. An attribute self-issued without such authority will fail the
+delegator-authority check in Step 2 of <a href="#phase2" class="auto internal xref">Section 6.2</a>.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+<p id="section-5.2-5">Intermediate ASes that receive an UPDATE carrying a
+ROUTE_DELEGATION_ATTEST attribute <span class="bcp14">MUST NOT</span> alter the attribute value. Per
+standard transitive attribute semantics <span>[<a href="#RFC4271" class="cite xref">RFC4271</a>]</span>, an AS that does not
+recognize the attribute type code forwards it unchanged and sets the
+Partial bit; setting the Partial bit does not affect SODA validation,
+because the Signed-Data (<a href="#signing" class="auto internal xref">Section 4.3</a>) does not include the attribute
+flags.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
+<p id="section-5.2-6">A BGP speaker that aggregates routes such that the announced prefix or the
+origin AS of the resulting aggregate differs from the Prefix or the
+Delegatee-ASN carried in a ROUTE_DELEGATION_ATTEST attribute <span class="bcp14">MUST</span> remove
+the attribute from the aggregate, because the attestation no longer
+corresponds to the announcement. If such an attribute is nonetheless
+retained, it will fail validation (Step 5 or Step 6 of <a href="#phase2" class="auto internal xref">Section 6.2</a>) and the
+aggregate will be treated as ROV-Invalid; SODA thus fails safe under
+aggregation. Determination of the origin AS in the presence of an AS_SET
+follows the rules of <span>[<a href="#RFC6811" class="cite xref">RFC6811</a>]</span>.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="validation-procedure">
+<section id="section-6">
+      <h2 id="name-validation-procedure">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-validation-procedure" class="section-name selfRef">Validation Procedure</a>
+      </h2>
+<p id="section-6-1">Validation of routes carrying ROUTE_DELEGATION_ATTEST follows a two-phase
+procedure. Phase 1 is standard ROV; Phase 2 is the SODA fallback,
+activated only if Phase 1 produces an Invalid result.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div id="phase-1-route-origin-validation">
+<section id="section-6.1">
+        <h3 id="name-phase-1-route-origin-valida">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-phase-1-route-origin-valida" class="section-name selfRef">Phase 1: Route Origin Validation</a>
+        </h3>
+<p id="section-6.1-1">Perform ROV as specified in <span>[<a href="#RFC6811" class="cite xref">RFC6811</a>]</span> and <span>[<a href="#RFC9582" class="cite xref">RFC9582</a>]</span>:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.1-2">
+<li id="section-6.1-2.1">
+            <p id="section-6.1-2.1.1">Determine the effective origin AS from the AS_PATH attribute.<a href="#section-6.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-2.2">
+            <p id="section-6.1-2.2.1">Query the local RPKI cache for ROAs covering the announced prefix.<a href="#section-6.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-2.3">
+            <p id="section-6.1-2.3.1">If a matching ROA is found (prefix covered, origin AS matches, prefix
+length within maxLength), the result is ROV-Valid. The route is
+accepted; SODA evaluation is not performed.<a href="#section-6.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-2.4">
+            <p id="section-6.1-2.4.1">If no ROA covers the announced prefix, the result is ROV-NotFound, and
+SODA evaluation is not performed: with no validated ROA, there is no
+RPKI anchor from which the delegator's authority over the prefix could
+be derived.<a href="#section-6.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.1-2.5">
+            <p id="section-6.1-2.5.1">If a ROA covers the announced prefix but the origin AS does not match,
+the result is ROV-Invalid. Proceed to Phase 2 (<a href="#phase2" class="auto internal xref">Section 6.2</a>).<a href="#section-6.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
+<div id="phase2">
+<section id="section-6.2">
+        <h3 id="name-phase-2-soda-fallback-valid">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-phase-2-soda-fallback-valid" class="section-name selfRef">Phase 2: SODA Fallback Validation</a>
+        </h3>
+<p id="section-6.2-1">Phase 2 is entered only when Phase 1 produces ROV-Invalid. This indicates
+that a ROA exists for the prefix (establishing an RPKI trust anchor) but
+the origin AS does not match the ROA. Phase 2 determines whether this
+mismatch is the result of a legitimate delegation. The checks below are
+conjunctive: any failure yields the indicated result and terminates Phase
+2. They <span class="bcp14">MAY</span> be performed in any order; for the performance implications of
+ordering, see <a href="#dos" class="auto internal xref">Section 8.6</a>.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2-2">
+<li id="section-6.2-2.1">
+            <p id="section-6.2-2.1.1">If the UPDATE does not carry a ROUTE_DELEGATION_ATTEST attribute, if
+the attribute is syntactically malformed, if it carries an
+unrecognized Version, or if it specifies an unrecognized Sig-Alg-ID,
+then SODA evaluation cannot be completed: the ROV-Invalid result
+stands and no further SODA processing is performed.<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-2.2">
+            <p id="section-6.2-2.2.1">Verify, using the validated RPKI certificate tree, that the
+Delegator-ASN and the announced prefix are covered by a common RPKI
+resource certificate, i.e., that a single resource holder holds both
+the Delegator-ASN (as an AS resource) and the announced prefix (as an
+IP resource). If no such common certificate exists, the result is
+SODA-Invalid. This step anchors the delegation to address-space
+holdership: it establishes that the delegator holds the prefix and thus
+has authority to delegate its origination, rather than merely
+permission to originate it (which a ROA conveys and which is not
+sufficient; see <a href="#delegator-authority" class="auto internal xref">Section 8.1</a>). This check requires access to
+RPKI certificate resource information, which is available to a relying
+party with repository access (the same access used in Step 3).<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-2.3">
+            <p id="section-6.2-2.3.1">Using the Delegator-ASN, retrieve the corresponding BGPsec router
+certificate from the RPKI repository, as specified in <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>, and
+extract its public key. If no valid BGPsec router certificate is found
+for the Delegator-ASN, the result is SODA-Invalid.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-2.4">
+            <p id="section-6.2-2.4.1">Using the retrieved public key and the algorithm identified by
+Sig-Alg-ID, verify the Signature over the Signed-Data defined in
+<a href="#signing" class="auto internal xref">Section 4.3</a>. If signature verification fails, the result is
+SODA-Invalid.<a href="#section-6.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-2.5">
+            <p id="section-6.2-2.5.1">Verify that the announced prefix is consistent with the delegated
+scope carried in the attribute: the most significant Prefix-Length
+bits of the announced prefix <span class="bcp14">MUST</span> equal the Prefix field, and the
+length of the announced prefix <span class="bcp14">MUST</span> be greater than or equal to
+Prefix-Length and less than or equal to MaxLength. If the announced
+prefix falls outside this scope, the result is SODA-Invalid. This step
+ensures that a delegation signed for one prefix cannot be used to
+authorize a different prefix.<a href="#section-6.2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-2.6">
+            <p id="section-6.2-2.6.1">Verify that the Delegatee-ASN field equals the effective origin AS
+determined from the AS_PATH attribute of the BGP UPDATE. If the values
+do not match, the result is SODA-Invalid.<a href="#section-6.2-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-2.7">
+            <p id="section-6.2-2.7.1">Compare the Delegation-Expiry value against the current time at the
+moment of evaluation. If the current time is greater than or equal to
+Delegation-Expiry, the result is SODA-Expired. Otherwise (the current
+time is strictly less than Delegation-Expiry), the result is
+SODA-Valid.<a href="#section-6.2-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
+<div id="outcome">
+<section id="section-6.3">
+        <h3 id="name-local-policy">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-local-policy" class="section-name selfRef">Local Policy</a>
+        </h3>
+<p id="section-6.3-1">This document defines the SODA validation outcomes SODA-Valid,
+SODA-Invalid, and SODA-Expired, which operators can incorporate into
+local routing policy. Consistent with <span>[<a href="#RFC8481" class="cite xref">RFC8481</a>]</span>, a router applies no
+SODA-derived policy to a route except as configured by the operator.
+Implementations <span class="bcp14">SHOULD</span> make the following behaviors configurable:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3-2.1">
+            <p id="section-6.3-2.1.1">Accept routes with a SODA-Valid outcome (<span class="bcp14">RECOMMENDED</span> for operators with
+delegatee relationships).<a href="#section-6.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-2.2">
+            <p id="section-6.3-2.2.1">Log and alert on SODA-Expired outcomes to trigger delegator
+notification.<a href="#section-6.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.3-2.3">
+            <p id="section-6.3-2.3.1">Apply a more restrictive local policy to routes with a SODA-Invalid
+outcome than to routes with an ordinary ROV-Invalid outcome, since the
+presence of a ROUTE_DELEGATION_ATTEST attribute that fails verification
+may indicate an active attempt to misuse the delegation mechanism.<a href="#section-6.3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-6.3-3">Because BGP does not provide a mechanism for timed route withdrawal,
+validators <span class="bcp14">SHOULD</span> periodically re-evaluate locally cached routes against
+the Delegation-Expiry timestamps of any stored ROUTE_DELEGATION_ATTEST
+attributes. The appropriate re-evaluation interval is a matter of local
+policy; implementations <span class="bcp14">SHOULD</span> support configuration of this interval.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="relationship-to-existing-mechanisms">
+<section id="section-7">
+      <h2 id="name-relationship-to-existing-me">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-relationship-to-existing-me" class="section-name selfRef">Relationship to Existing Mechanisms</a>
+      </h2>
+<p id="section-7-1">SODA is designed to complement, not replace, existing BGP security
+mechanisms. The following summarizes the relationship between SODA and
+related standards:<a href="#section-7-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-7-2">
+        <dt id="section-7-2.1">ROV and ROA (<span>[<a href="#RFC6811" class="cite xref">RFC6811</a>]</span>, <span>[<a href="#RFC9582" class="cite xref">RFC9582</a>]</span>):</dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.2">
+          <p id="section-7-2.2.1">Phase 1 of SODA validation performs standard ROV as defined in
+<span>[<a href="#RFC6811" class="cite xref">RFC6811</a>]</span>. A valid ROA covering the announced prefix is a necessary
+precondition for SODA evaluation; SODA does not substitute for ROV. The
+NotFound result explicitly excludes SODA evaluation, preserving the
+integrity of the RPKI trust chain.<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.3">BGPsec (<span>[<a href="#RFC8205" class="cite xref">RFC8205</a>]</span>):</dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.4">
+          <p id="section-7-2.4.1">SODA relies on BGPsec router certificates defined in <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span> for
+signature validation. No new PKI is required. SODA and BGPsec address
+orthogonal properties (origin delegation versus path integrity) and may
+coexist in the same UPDATE message.<a href="#section-7-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-7-2.5">Signed Prefix Lists (SPL) (<span>[<a href="#I-D.ietf-sidrops-rpki-prefixlist" class="cite xref">I-D.ietf-sidrops-rpki-prefixlist</a>]</span>, <span>[<a href="#I-D.ietf-sidrops-spl-verification" class="cite xref">I-D.ietf-sidrops-spl-verification</a>]</span>):</dt>
+        <dd style="margin-left: 1.5em" id="section-7-2.6">
+          <p id="section-7-2.6.1">An SPL is an RPKI object, published to the repository, in which an AS
+lists the complete set of prefixes it may originate. As the SPL profile
+notes, an SPL is self-asserted by the AS holder and carries no authority
+from any prefix holder; that authority is conveyed separately by a ROA.
+SODA differs in both trust root and delivery: a SODA attestation is
+signed by the holder of the prefix (the delegator), is bound to a
+specific announcement, and is carried in band rather than published as a
+repository object. SODA is therefore a prefix-holder authorization for a
+third party to originate, whereas an SPL is a self-description by an
+origin AS of its own intended originations.<a href="#section-7-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="security-considerations">
+<section id="section-8">
+      <h2 id="name-security-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<div id="delegator-authority">
+<section id="section-8.1">
+        <h3 id="name-scope-of-delegator-authorit">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-scope-of-delegator-authorit" class="section-name selfRef">Scope of Delegator Authority</a>
+        </h3>
+<p id="section-8.1-1">A ROA expresses that an AS may originate a prefix; it does not express
+that the AS may further delegate origination of that prefix to a third
+party. If SODA anchored delegation authority in a ROA's origin AS, then
+any AS that a prefix holder had authorized to originate the prefix (for
+example, a transit provider or a previous delegatee) could in turn issue
+SODA attestations naming arbitrary further delegatees, an escalation the
+prefix holder may not have intended.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">For this reason, SODA anchors delegation authority in address-space
+holdership rather than in origination authorization. Step 2 of <a href="#phase2" class="auto internal xref">Section 6.2</a>
+requires the Delegator-ASN and the announced prefix to be covered by a
+common RPKI resource certificate, establishing that a single resource
+holder holds both the AS and the prefix and therefore that the delegator
+is entitled to delegate the prefix's origination.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="stale-route-window">
+<section id="section-8.2">
+        <h3 id="name-stale-route-window">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-stale-route-window" class="section-name selfRef">Stale Route Window</a>
+        </h3>
+<p id="section-8.2-1">BGP does not natively support timed route withdrawal. When a
+Delegation-Expiry timestamp passes, the route remains in the RIB as
+SODA-Expired until a BGP UPDATE or withdrawal is received or until the
+validator performs a periodic re-evaluation sweep. Operators <span class="bcp14">SHOULD</span>
+configure validators to perform periodic re-evaluation as described in
+<a href="#outcome" class="auto internal xref">Section 6.3</a> and <span class="bcp14">SHOULD</span> configure delegatees to withdraw delegated routes
+promptly upon expiry.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="bgpsec-key-compromise">
+<section id="section-8.3">
+        <h3 id="name-bgpsec-key-compromise">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-bgpsec-key-compromise" class="section-name selfRef">BGPsec Key Compromise</a>
+        </h3>
+<p id="section-8.3-1">If a delegator's BGPsec router certificate private key is compromised, an
+attacker can forge SODA attributes for any prefix held by the same
+resource holder as the delegator's AS, i.e., any prefix covered by a
+common RPKI resource certificate with that AS (see
+<a href="#delegator-authority" class="auto internal xref">Section 8.1</a>). The delegator <span class="bcp14">SHOULD</span> revoke the compromised
+BGPsec router certificate immediately, which will cause all outstanding
+SODA attribute values signed by that key to fail Step 3 of <a href="#phase2" class="auto internal xref">Section 6.2</a>.
+Certificate revocation follows BGPsec key rollover procedures as defined
+in <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="replay-of-valid-soda-attributes">
+<section id="section-8.4">
+        <h3 id="name-replay-of-valid-soda-attrib">
+<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-replay-of-valid-soda-attrib" class="section-name selfRef">Replay of Valid SODA Attributes</a>
+        </h3>
+<p id="section-8.4-1">A valid ROUTE_DELEGATION_ATTEST attribute may be replayed by an attacker
+until the Delegation-Expiry timestamp is reached. The prefix-consistency
+check in Step 5 of <a href="#phase2" class="auto internal xref">Section 6.2</a> confines any such replay to the exact
+prefix and length range named in the signed attribute; it cannot be used
+to authorize a different prefix.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
+<p id="section-8.4-2">This document relies on bounded delegation lifetimes to limit replay
+exposure. Operators are encouraged to use relatively short delegation
+lifetimes and to renew delegations as necessary.<a href="#section-8.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="removal">
+<section id="section-8.5">
+        <h3 id="name-removal-of-the-attribute">
+<a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-removal-of-the-attribute" class="section-name selfRef">Removal of the Attribute</a>
+        </h3>
+<p id="section-8.5-1">Because ROUTE_DELEGATION_ATTEST is an optional, transitive attribute, an
+on-path adversary on a BGP session can remove it from an UPDATE. Removal
+does not enable a route hijack: without the attribute, the route reverts
+to an ordinary ROV-Invalid result and is rejected by validators applying
+the <span class="bcp14">RECOMMENDED</span> policy in <a href="#outcome" class="auto internal xref">Section 6.3</a>. Removal can, however, cause a
+legitimately delegated route to be rejected. SODA therefore fails safe
+against hijack, but does not protect the availability of a delegated
+route against an adversary able to strip the attribute in transit.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="dos">
+<section id="section-8.6">
+        <h3 id="name-computational-cost-and-deni">
+<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-computational-cost-and-deni" class="section-name selfRef">Computational Cost and Denial of Service</a>
+        </h3>
+<p id="section-8.6-1">Phase 2 of validation (<a href="#phase2" class="auto internal xref">Section 6.2</a>) performs RPKI certificate-tree lookups
+and a signature verification. Because Phase 2 is reached only for
+ROV-Invalid routes, an adversary can attach a malformed or unverifiable
+ROUTE_DELEGATION_ATTEST attribute to a large number of announcements that
+are already ROV-Invalid, attempting to induce expensive lookups and
+verifications at validators.<a href="#section-8.6-1" class="pilcrow">¶</a></p>
+<p id="section-8.6-2">To bound this cost, and because the Phase 2 checks may be performed in any
+order, implementations <span class="bcp14">SHOULD</span> perform the inexpensive checks first: the
+attribute presence, well-formedness, Version, and Sig-Alg-ID checks of
+Step 1; the prefix-consistency check of Step 5; and the Delegatee-ASN
+match of Step 6. Only if those succeed should an implementation perform
+the RPKI lookups of Steps 2 and 3 and the signature verification of Step
+4. Implementations <span class="bcp14">SHOULD</span> cache Phase 2 results keyed on the attribute
+value, so that repeated announcements carrying the same attribute are not
+re-verified, and <span class="bcp14">SHOULD</span> be able to rate-limit Phase 2 processing,
+including on a per-peer basis. These measures keep the additional work
+introduced by SODA bounded even under a flood of crafted attributes.<a href="#section-8.6-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="path-validation">
+<section id="section-8.7">
+        <h3 id="name-path-validation">
+<a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-path-validation" class="section-name selfRef">Path Validation</a>
+        </h3>
+<p id="section-8.7-1">SODA provides attestation of route origin delegation only. It does not
+validate the AS_PATH beyond checking that the origin AS matches the
+Delegatee-ASN. SODA is orthogonal to and compatible with BGPsec
+<span>[<a href="#RFC8205" class="cite xref">RFC8205</a>]</span> and ASPA <span>[<a href="#I-D.ietf-sidrops-aspa-verification" class="cite xref">I-D.ietf-sidrops-aspa-verification</a>]</span>, which address
+path validity. Operators requiring end-to-end path security <span class="bcp14">SHOULD</span> deploy
+SODA in conjunction with BGPsec or ASPA.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana-considerations">
+<section id="section-9">
+      <h2 id="name-iana-considerations">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<div id="bgp-path-attribute-type-code">
+<section id="section-9.1">
+        <h3 id="name-bgp-path-attribute-type-cod">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-bgp-path-attribute-type-cod" class="section-name selfRef">BGP Path Attribute Type Code</a>
+        </h3>
+<p id="section-9.1-1">IANA is requested to assign a new type code in the "BGP Path Attributes"
+registry for the ROUTE_DELEGATION_ATTEST attribute defined in this
+document:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<table class="center" id="table-1">
+          <caption><a href="#table-1" class="selfRef">Table 1</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Code</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">TBD</td>
+              <td class="text-left" rowspan="1" colspan="1">ROUTE_DELEGATION_ATTEST</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+<div id="iana-algs">
+<section id="section-9.2">
+        <h3 id="name-soda-signature-algorithm-id">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-soda-signature-algorithm-id" class="section-name selfRef">SODA Signature Algorithm Identifiers</a>
+        </h3>
+<p id="section-9.2-1">IANA is requested to create a new registry, "SODA Signature Algorithm
+Identifiers", to record the one-octet Sig-Alg-ID values used by the
+ROUTE_DELEGATION_ATTEST attribute. The registration policy is IETF Review
+<span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">The initial contents of the registry are:<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+<table class="center" id="table-2">
+          <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Value</th>
+              <th class="text-left" rowspan="1" colspan="1">Algorithm</th>
+              <th class="text-left" rowspan="1" colspan="1">Reference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x00</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved</td>
+              <td class="text-left" rowspan="1" colspan="1">This document</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x01</td>
+              <td class="text-left" rowspan="1" colspan="1">ECDSA P-256 with SHA-256</td>
+              <td class="text-left" rowspan="1" colspan="1">RFC 8608</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0x02-0xFF</td>
+              <td class="text-left" rowspan="1" colspan="1">Unassigned</td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+            </tr>
+          </tbody>
+        </table>
+</section>
+</div>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-10">
+      <h2 id="name-references">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-10.1">
+        <h3 id="name-normative-references">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4271">[RFC4271]</dt>
+        <dd>
+<span class="refAuthor">Rekhter, Y., Ed.</span>, <span class="refAuthor">Li, T., Ed.</span>, and <span class="refAuthor">S. Hares, Ed.</span>, <span class="refTitle">"A Border Gateway Protocol 4 (BGP-4)"</span>, <span class="seriesInfo">RFC 4271</span>, <span class="seriesInfo">DOI 10.17487/RFC4271</span>, <time datetime="2006-01" class="refDate">January 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4271">https://www.rfc-editor.org/rfc/rfc4271</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6480">[RFC6480]</dt>
+        <dd>
+<span class="refAuthor">Lepinski, M.</span> and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"An Infrastructure to Support Secure Internet Routing"</span>, <span class="seriesInfo">RFC 6480</span>, <span class="seriesInfo">DOI 10.17487/RFC6480</span>, <time datetime="2012-02" class="refDate">February 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6480">https://www.rfc-editor.org/rfc/rfc6480</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6811">[RFC6811]</dt>
+        <dd>
+<span class="refAuthor">Mohapatra, P.</span>, <span class="refAuthor">Scudder, J.</span>, <span class="refAuthor">Ward, D.</span>, <span class="refAuthor">Bush, R.</span>, and <span class="refAuthor">R. Austein</span>, <span class="refTitle">"BGP Prefix Origin Validation"</span>, <span class="seriesInfo">RFC 6811</span>, <span class="seriesInfo">DOI 10.17487/RFC6811</span>, <time datetime="2013-01" class="refDate">January 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6811">https://www.rfc-editor.org/rfc/rfc6811</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8126">[RFC8126]</dt>
+        <dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Leiba, B.</span>, and <span class="refAuthor">T. Narten</span>, <span class="refTitle">"Guidelines for Writing an IANA Considerations Section in RFCs"</span>, <span class="seriesInfo">BCP 26</span>, <span class="seriesInfo">RFC 8126</span>, <span class="seriesInfo">DOI 10.17487/RFC8126</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8126">https://www.rfc-editor.org/rfc/rfc8126</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8205">[RFC8205]</dt>
+        <dd>
+<span class="refAuthor">Lepinski, M., Ed.</span> and <span class="refAuthor">K. Sriram, Ed.</span>, <span class="refTitle">"BGPsec Protocol Specification"</span>, <span class="seriesInfo">RFC 8205</span>, <span class="seriesInfo">DOI 10.17487/RFC8205</span>, <time datetime="2017-09" class="refDate">September 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8205">https://www.rfc-editor.org/rfc/rfc8205</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8209">[RFC8209]</dt>
+        <dd>
+<span class="refAuthor">Reynolds, M.</span>, <span class="refAuthor">Turner, S.</span>, and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"A Profile for BGPsec Router Certificates, Certificate Revocation Lists, and Certification Requests"</span>, <span class="seriesInfo">RFC 8209</span>, <span class="seriesInfo">DOI 10.17487/RFC8209</span>, <time datetime="2017-09" class="refDate">September 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8209">https://www.rfc-editor.org/rfc/rfc8209</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8608">[RFC8608]</dt>
+        <dd>
+<span class="refAuthor">Turner, S.</span> and <span class="refAuthor">O. Borchert</span>, <span class="refTitle">"BGPsec Algorithms, Key Formats, and Signature Formats"</span>, <span class="seriesInfo">RFC 8608</span>, <span class="seriesInfo">DOI 10.17487/RFC8608</span>, <time datetime="2019-06" class="refDate">June 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8608">https://www.rfc-editor.org/rfc/rfc8608</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9582">[RFC9582]</dt>
+      <dd>
+<span class="refAuthor">Snijders, J.</span>, <span class="refAuthor">Maddison, B.</span>, <span class="refAuthor">Lepinski, M.</span>, <span class="refAuthor">Kong, D.</span>, and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"A Profile for Route Origin Authorizations (ROAs)"</span>, <span class="seriesInfo">RFC 9582</span>, <span class="seriesInfo">DOI 10.17487/RFC9582</span>, <time datetime="2024-05" class="refDate">May 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9582">https://www.rfc-editor.org/rfc/rfc9582</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-10.2">
+        <h3 id="name-informative-references">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="I-D.ietf-sidrops-aspa-verification">[I-D.ietf-sidrops-aspa-verification]</dt>
+        <dd>
+<span class="refAuthor">Azimov, A.</span>, <span class="refAuthor">Bogomazov, E.</span>, <span class="refAuthor">Bush, R.</span>, <span class="refAuthor">Patel, K.</span>, <span class="refAuthor">Snijders, J.</span>, and <span class="refAuthor">K. Sriram</span>, <span class="refTitle">"BGP AS_PATH Verification Based on Autonomous System Provider Authorization (ASPA) Objects"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-sidrops-aspa-verification-25</span>, <time datetime="2026-04-19" class="refDate">19 April 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-verification-25">https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-verification-25</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-sidrops-rpki-prefixlist">[I-D.ietf-sidrops-rpki-prefixlist]</dt>
+        <dd>
+<span class="refAuthor">Snijders, J.</span> and <span class="refAuthor">G. Huston</span>, <span class="refTitle">"A profile for Signed Prefix Lists for Use in the Resource Public Key Infrastructure (RPKI)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-sidrops-rpki-prefixlist-05</span>, <time datetime="2025-12-10" class="refDate">10 December 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-rpki-prefixlist-05">https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-rpki-prefixlist-05</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-sidrops-spl-verification">[I-D.ietf-sidrops-spl-verification]</dt>
+        <dd>
+<span class="refAuthor">Sriram, K.</span>, <span class="refAuthor">Snijders, J.</span>, and <span class="refAuthor">D. Montgomery</span>, <span class="refTitle">"Signed Prefix List (SPL) Based Route Origin Verification and Operational Considerations"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-sidrops-spl-verification-04</span>, <time datetime="2026-06-17" class="refDate">17 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-spl-verification-04">https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-spl-verification-04</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IMC2024">[IMC2024]</dt>
+        <dd>
+<span class="refAuthor">Du, X.</span>, <span class="refAuthor">Fontugne, R.</span>, <span class="refAuthor">Testart, C.</span>, <span class="refAuthor">Snoeren, A. C.</span>, and <span class="refAuthor">kc. claffy</span>, <span class="refTitle">"Sublet Your Subnet: Inferring IP Leasing in the Wild"</span>, <span class="seriesInfo">In Proceedings of the ACM Internet Measurement Conference (IMC 2024)</span>, <time datetime="2024" class="refDate">2024</time>. </dd>
+<dd class="break"></dd>
+<dt id="NDSS2026">[NDSS2026]</dt>
+        <dd>
+<span class="refAuthor">Li, W.</span>, <span class="refAuthor">Wan, T.</span>, and <span class="refAuthor">T. Chung</span>, <span class="refTitle">"Demystifying RPKI-Invalid Prefixes: Hidden Causes and Security Risks"</span>, <span class="seriesInfo">In Proceedings of the Network and Distributed System Security Symposium (NDSS 2026)</span>, <time datetime="2026" class="refDate">2026</time>. </dd>
+<dd class="break"></dd>
+<dt id="Oakland26">[Oakland26]</dt>
+        <dd>
+<span class="refAuthor">Li, W.</span>, <span class="refAuthor">Xu, Y.</span>, and <span class="refAuthor">T. Chung</span>, <span class="refTitle">"The Threat Landscape of IP Leasing in the RPKI Era"</span>, <span class="seriesInfo">In Proceedings of the IEEE Symposium on Security and Privacy (Oakland'26), San Francisco, USA</span>, <time datetime="2026-05" class="refDate">May 2026</time>, <span>&lt;<a href="https://weitongli.com/publications/papers/li-2026-hijack.pdf">https://weitongli.com/publications/papers/li-2026-hijack.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8210">[RFC8210]</dt>
+        <dd>
+<span class="refAuthor">Bush, R.</span> and <span class="refAuthor">R. Austein</span>, <span class="refTitle">"The Resource Public Key Infrastructure (RPKI) to Router Protocol, Version 1"</span>, <span class="seriesInfo">RFC 8210</span>, <span class="seriesInfo">DOI 10.17487/RFC8210</span>, <time datetime="2017-09" class="refDate">September 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8210">https://www.rfc-editor.org/rfc/rfc8210</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8481">[RFC8481]</dt>
+      <dd>
+<span class="refAuthor">Bush, R.</span>, <span class="refTitle">"Clarifications to BGP Origin Validation Based on Resource Public Key Infrastructure (RPKI)"</span>, <span class="seriesInfo">RFC 8481</span>, <span class="seriesInfo">DOI 10.17487/RFC8481</span>, <time datetime="2018-09" class="refDate">September 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8481">https://www.rfc-editor.org/rfc/rfc8481</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgements">
+<section id="appendix-A">
+      <h2 id="name-acknowledgements">
+<a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+      </h2>
+<p id="appendix-A-1">The authors thank the researchers at CAIDA, Virginia Tech, and CableLabs
+whose measurement studies provided the empirical foundation for this
+work.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-B">
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Shenglin Jiang</span></div>
+<div dir="auto" class="left"><span class="org">Zhongguancun Laboratory</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:jiangshl@zgclab.edu.cn" class="email">jiangshl@zgclab.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Ke Xu</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:xuke@tsinghua.edu.cn" class="email">xuke@tsinghua.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Zhuotao Liu</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:zhuotaoliu@tsinghua.edu.cn" class="email">zhuotaoliu@tsinghua.edu.cn</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Xiaoliang Wang</span></div>
+<div dir="auto" class="left"><span class="org">Tsinghua University</span></div>
+<div dir="auto" class="left"><span class="locality">Beijing</span></div>
+<div dir="auto" class="left"><span class="country-name">China</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:wangxiaoliang0623@foxmail.com" class="email">wangxiaoliang0623@foxmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
