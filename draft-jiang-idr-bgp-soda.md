@@ -9,7 +9,7 @@ number:
 date:
 consensus: true
 v: 3
-# area: "Routing"
+area: "Routing"
 workgroup: "Inter-Domain Routing"
 # keyword:
 #  - Inter-Domain Routing
