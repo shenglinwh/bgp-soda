@@ -1,0 +1,83 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2026-06-21T04:53:02.779477+00:00",
+  "repo": "shenglinwh/bgp-soda",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOS-KrWs7n3NST",
+      "title": "version v0",
+      "url": "https://github.com/shenglinwh/bgp-soda/pull/1",
+      "state": "MERGED",
+      "author": "shenglinwh",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-06-18T09:07:49Z",
+      "updatedAt": "2026-06-18T09:08:48Z",
+      "baseRepository": "shenglinwh/bgp-soda",
+      "baseRefName": "main",
+      "baseRefOid": "23a97ea42edd425d700bfbdd1602e4da585c68cc",
+      "headRepository": "shenglinwh/bgp-soda",
+      "headRefName": "v-00",
+      "headRefOid": "999d0ff8af230d7ca44471a4f391793b0218d505",
+      "closedAt": "2026-06-18T09:08:48Z",
+      "mergedAt": "2026-06-18T09:08:47Z",
+      "mergedBy": "shenglinwh",
+      "mergeCommit": {
+        "oid": "3256a6ace205da962188c0062ad2aad783d2f178"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
