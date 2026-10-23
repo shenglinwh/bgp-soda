@@ -209,9 +209,8 @@ In-band delivery requires that the validating AS implement SODA in order
 to obtain any benefit (see {{deployment}}), and it places signature
 verification on, or adjacent to, the BGP processing path, with an
 associated denial-of-service surface that is discussed in {{dos}}. SODA
-further relies on the existing RPKI and on BGPsec
-router certificates {{RFC8209}}; it introduces no new public key
-infrastructure.
+further relies on the existing RPKI and on SODA signing certificate;
+it introduces no new public key infrastructure.
 
 ## Relationship to Publishing an Additional ROA
 
@@ -336,7 +335,7 @@ MaxLength (1 octet):
 Delegator-ASN (4 octets):
 : The 4-octet AS Number of the delegator, i.e., an AS belonging to the
   holder of the delegated prefix. The delegator signs this attribute with
-  the private key of its BGPsec router certificate ({{RFC8209}}). The
+  the private key of its SODA signing certificate. The
   binding between the Delegator-ASN and the prefix, which establishes the
   delegator's authority to delegate origination, is verified as described
   in {{delegator-authority}}.
@@ -351,14 +350,14 @@ Delegation-Expiry (4 octets):
   integer representing seconds since the Unix epoch (January 1, 1970,
   00:00:00 UTC). This value indicates the end of the intended delegation
   period, independent of the validity period of any RPKI certificate or
-  BGPsec router certificate. Validators MUST compare this field against
+  SODA signing certificate. Validators MUST compare this field against
   the current time during SODA evaluation, as specified in {{phase2}}.
 
 Sig-Length (2 octets):
 : The length, in octets, of the Signature field. For Sig-Alg-ID 0x01
   (ECDSA P-256), the signature is encoded as a fixed 64-octet value, the
   concatenation of the two 32-octet integers r and s, as specified for
-  BGPsec signatures in {{RFC8608}}.
+  signatures in {{RFC8608}}.
 
 Prefix (variable, 0-16 octets):
 : The IP address prefix to which this delegation applies, encoded as the
@@ -373,9 +372,9 @@ Prefix (variable, 0-16 octets):
   family.
 
 Signature (variable):
-: The digital signature produced by the delegator using the private key
-  corresponding to its BGPsec router certificate. The signed data is
-  defined in {{signing}}.
+: The digital signature produced by the delegator using a dedicated signing
+key for SODA. The corresponding public key MUST be authenticated
+through the RPKI. The signed data is defined in {{signing}}.
 
 ## Signed Data {#signing}
 
@@ -405,11 +404,9 @@ signature and prevents version or algorithm substitution.
 
 A delegator MUST be the holder of the delegated prefix in the RPKI, i.e.,
 the resource holder to whom the prefix is allocated or sub-allocated. The
-delegator's AS and the delegated prefix MUST therefore be covered by a
-common RPKI resource certificate, so that the delegator's authority over
-the prefix can be verified as described in {{delegator-authority}}. The
-delegator MUST also hold a BGPsec router certificate for its AS, as
-defined in {{RFC8209}}, whose private key it uses to sign the attribute.
+delegator's authority over the delegated prefix MUST be established through
+a valid RPKI resource certificate covering the prefix. The delegator MUST
+use a dedicated signing key for SODA.
 Authority to delegate origination follows from holding the address space;
 it is distinct from, and stronger than, mere authorization to originate
 the prefix, which a ROA alone conveys.
@@ -421,7 +418,7 @@ To issue a ROUTE_DELEGATION_ATTEST attribute value for a delegation:
    MaxLength, and Delegation-Expiry values.
 
 2. Compute the signature over the Signed-Data as specified in
-   {{signing}}, using the BGPsec router certificate private key.
+   {{signing}}, using the SODA signing private key.
 
 3. Deliver the signed attribute value to the delegatee via an
    out-of-band channel. The out-of-band delivery protocol is outside the
@@ -505,7 +502,9 @@ the origin AS does not match the ROA. Phase 2 determines whether this
 mismatch is the result of a legitimate delegation. The checks below are
 conjunctive: any failure yields the indicated result and terminates Phase
 2. They MAY be performed in any order; for the performance implications of
-ordering, see {{dos}}.
+ordering, see {{dos}}. RPKI certificate validation and resource
+authorization checks are performed by an RPKI relying party (RP) or a
+validation component using RP-validated information.
 
 1. If the UPDATE does not carry a ROUTE_DELEGATION_ATTEST attribute, if
    the attribute is syntactically malformed, if it carries an
@@ -513,30 +512,28 @@ ordering, see {{dos}}.
    then SODA evaluation cannot be completed: the ROV-Invalid result
    stands and no further SODA processing is performed.
 
-2. Verify, using the validated RPKI certificate tree, that the
-   Delegator-ASN and the announced prefix are covered by a common RPKI
-   resource certificate, i.e., that a single resource holder holds both
-   the Delegator-ASN (as an AS resource) and the announced prefix (as an
-   IP resource). If no such common certificate exists, the result is
+2. Verify that the SODA signing certificate is valid and that its certified
+   IP address resources cover the delegated prefix. If the certificate does
+   not authorize the delegated prefix, the result is SODA-Invalid.
+   If no such common certificate exists, the result is
    SODA-Invalid. This step anchors the delegation to address-space
    holdership: it establishes that the delegator holds the prefix and thus
    has authority to delegate its origination, rather than merely
    permission to originate it (which a ROA conveys and which is not
-   sufficient; see {{delegator-authority}}). This check requires access to
-   RPKI certificate resource information, which is available to a relying
-   party with repository access (the same access used in Step 3).
+   sufficient; see {{delegator-authority}}). This authorization check is
+   performed using resource information validated by an RPKI relying party (RP),
+   without requiring the BGP router to inspect the RPKI certificate tree.
 
-3. Using the Delegator-ASN, retrieve the corresponding BGPsec router
-   certificate from the RPKI repository, as specified in {{RFC8209}}, and
-   extract its public key. If no valid BGPsec router certificate is found
-   for the Delegator-ASN, the result is SODA-Invalid.
+3. Identify the corresponding SODA signing certificate using validated RPKI
+   information and extract its public key. If no valid SODA signing certificate
+   is found for the Delegator-ASN, the result is SODA-Invalid.
 
-4. Using the retrieved public key and the algorithm identified by
+5. Using the retrieved public key and the algorithm identified by
    Sig-Alg-ID, verify the Signature over the Signed-Data defined in
    {{signing}}. If signature verification fails, the result is
    SODA-Invalid.
 
-5. Verify that the announced prefix is consistent with the delegated
+6. Verify that the announced prefix is consistent with the delegated
    scope carried in the attribute: the most significant Prefix-Length
    bits of the announced prefix MUST equal the Prefix field, and the
    length of the announced prefix MUST be greater than or equal to
@@ -545,11 +542,11 @@ ordering, see {{dos}}.
    ensures that a delegation signed for one prefix cannot be used to
    authorize a different prefix.
 
-6. Verify that the Delegatee-ASN field equals the effective origin AS
+7. Verify that the Delegatee-ASN field equals the effective origin AS
    determined from the AS_PATH attribute of the BGP UPDATE. If the values
    do not match, the result is SODA-Invalid.
 
-7. Compare the Delegation-Expiry value against the current time at the
+8. Compare the Delegation-Expiry value against the current time at the
    moment of evaluation. If the current time is greater than or equal to
    Delegation-Expiry, the result is SODA-Expired. Otherwise (the current
    time is strictly less than Delegation-Expiry), the result is
@@ -623,12 +620,11 @@ example, a transit provider or a previous delegatee) could in turn issue
 SODA attestations naming arbitrary further delegatees, an escalation the
 prefix holder may not have intended.
 
-For this reason, SODA anchors delegation authority in address-space
-holdership rather than in origination authorization. Step 2 of {{phase2}}
-requires the Delegator-ASN and the announced prefix to be covered by a
-common RPKI resource certificate, establishing that a single resource
-holder holds both the AS and the prefix and therefore that the delegator
-is entitled to delegate the prefix's origination.
+For this reason, SODA anchors delegation authority in IP address resource
+holdership rather than in route origination authorization. The delegator's
+authority is established through the IP address resources associated with the
+validated SODA signing certificate, independently of any AS number held
+by the delegator.
 
 ## Stale Route Window
 
@@ -639,18 +635,6 @@ validator performs a periodic re-evaluation sweep. Operators SHOULD
 configure validators to perform periodic re-evaluation as described in
 {{outcome}} and SHOULD configure delegatees to withdraw delegated routes
 promptly upon expiry.
-
-## BGPsec Key Compromise
-
-If a delegator's BGPsec router certificate private key is compromised, an
-attacker can forge SODA attributes for any prefix held by the same
-resource holder as the delegator's AS, i.e., any prefix covered by a
-common RPKI resource certificate with that AS (see
-{{delegator-authority}}). The delegator SHOULD revoke the compromised
-BGPsec router certificate immediately, which will cause all outstanding
-SODA attribute values signed by that key to fail Step 3 of {{phase2}}.
-Certificate revocation follows BGPsec key rollover procedures as defined
-in {{RFC8209}}.
 
 ## Replay of Valid SODA Attributes
 
@@ -677,8 +661,10 @@ route against an adversary able to strip the attribute in transit.
 
 ## Computational Cost and Denial of Service {#dos}
 
-Phase 2 of validation ({{phase2}}) performs RPKI certificate-tree lookups
-and a signature verification. Because Phase 2 is reached only for
+Phase 2 of validation (Section 6.2) requires resource authorization checks
+and signature verification. RPKI certificate processing is performed by an
+RP or an associated validation component, without requiring BGP routers
+to access the RPKI certificate tree. Because Phase 2 is reached only for
 ROV-Invalid routes, an adversary can attach a malformed or unverifiable
 ROUTE_DELEGATION_ATTEST attribute to a large number of announcements that
 are already ROV-Invalid, attempting to induce expensive lookups and
