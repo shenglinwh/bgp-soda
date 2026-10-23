@@ -18,22 +18,22 @@ stated expiry time. Using SODA, a validator performing Route Origin
 Validation (ROV) can determine whether an ROV-Invalid result reflects an
 authorized delegation rather than a route hijack. 
     " name="description">
-<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="xml2rfc 3.34.1" name="generator">
 <meta content="draft-jiang-idr-bgp-soda-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.0
-    Python 3.14.5
-    ConfigArgParse 1.7.5
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.10.0
+    platformdirs 4.13.4
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.1
+    wcwidth 0.9.2
 -->
 <link href="draft-jiang-idr-bgp-soda.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -69,7 +69,6 @@ authorized delegation rather than a route hijack.
   src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: italic;
@@ -118,7 +117,6 @@ authorized delegation rather than a route hijack.
   src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-
 @font-face {
   font-family: 'Lora';
   font-style: normal;
@@ -183,7 +181,6 @@ authorized delegation rather than a route hijack.
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 }
 
 @font-face {
@@ -1052,11 +1049,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">BGP SODA</td>
-<td class="right">June 2026</td>
+<td class="right">October 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Jiang, et al.</td>
-<td class="center">Expires 20 December 2026</td>
+<td class="center">Expires 26 April 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1069,12 +1066,12 @@ svg {
 <dd class="internet-draft">draft-jiang-idr-bgp-soda-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-18" class="published">18 June 2026</time>
+<time datetime="2026-10-23" class="published">23 October 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-20">20 December 2026</time></dd>
+<dd class="expires"><time datetime="2027-04-26">26 April 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1107,6 +1104,17 @@ stated expiry time. Using SODA, a validator performing Route Origin
 Validation (ROV) can determine whether an ROV-Invalid result reflects an
 authorized delegation rather than a route hijack.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-discussion-venues">
+<a href="#name-discussion-venues" class="section-name selfRef">Discussion Venues</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">Discussion of this document takes place on the
+    Inter-Domain Routing Working Group mailing list (idr@ietf.org),
+    which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/idr/">https://mailarchive.ietf.org/arch/browse/idr/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">Source for this draft and an issue tracker can be found at
+    <span><a href="https://github.com/shenglinwh/bgp-soda">https://github.com/shenglinwh/bgp-soda</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+</section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
         <h2 id="name-status-of-this-memo">
@@ -1126,7 +1134,7 @@ authorized delegation rather than a route hijack.<a href="#section-abstract-1" c
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 26 April 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1227,19 +1235,16 @@ authorized delegation rather than a route hijack.<a href="#section-abstract-1" c
                 <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-stale-route-window" class="internal xref">Stale Route Window</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
-                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-bgpsec-key-compromise" class="internal xref">BGPsec Key Compromise</a></p>
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-replay-of-valid-soda-attrib" class="internal xref">Replay of Valid SODA Attributes</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
-                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-replay-of-valid-soda-attrib" class="internal xref">Replay of Valid SODA Attributes</a></p>
+                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-removal-of-the-attribute" class="internal xref">Removal of the Attribute</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5">
-                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-removal-of-the-attribute" class="internal xref">Removal of the Attribute</a></p>
+                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-computational-cost-and-deni" class="internal xref">Computational Cost and Denial of Service</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.6">
-                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-computational-cost-and-deni" class="internal xref">Computational Cost and Denial of Service</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.7">
-                <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="auto internal xref">8.7</a>.  <a href="#name-path-validation" class="internal xref">Path Validation</a></p>
+                <p id="section-toc.1-1.8.2.6.1"><a href="#section-8.6" class="auto internal xref">8.6</a>.  <a href="#name-path-validation" class="internal xref">Path Validation</a></p>
 </li>
             </ul>
 </li>
@@ -1376,10 +1381,9 @@ in global state after the delegation has ended.<a href="#section-3.1-3" class="p
 In-band delivery requires that the validating AS implement SODA in order
 to obtain any benefit (see <a href="#deployment" class="auto internal xref">Section 3.3</a>), and it places signature
 verification on, or adjacent to, the BGP processing path, with an
-associated denial-of-service surface that is discussed in <a href="#dos" class="auto internal xref">Section 8.6</a>. SODA
-further relies on the existing RPKI and on BGPsec
-router certificates <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>; it introduces no new public key
-infrastructure.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+associated denial-of-service surface that is discussed in <a href="#dos" class="auto internal xref">Section 8.5</a>. SODA
+further relies on the existing RPKI and on SODA signing certificate;
+it introduces no new public key infrastructure.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="relationship-to-publishing-an-additional-roa">
@@ -1423,13 +1427,13 @@ cost of the design.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2">The corresponding failure mode is, however, benign. Because a SODA-Valid
 outcome only ever causes a validator to accept a route that ROV alone
 would have rejected, the absence of SODA support, the removal of the
-attribute in transit (see <a href="#removal" class="auto internal xref">Section 8.5</a>), and the expiry of a delegation can
+attribute in transit (see <a href="#removal" class="auto internal xref">Section 8.4</a>), and the expiry of a delegation can
 each only cause a delegated route to be treated as ROV-Invalid. None of
 these conditions can cause an unauthorized route to be accepted. SODA thus
 fails safe with respect to hijack in every partial-deployment scenario.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
 <p id="section-3.3-3">Operators deploying SODA should also account for the cost of evaluating
 attributes attached to ROV-Invalid routes; this denial-of-service surface,
-and the implementation measures that bound it, are discussed in <a href="#dos" class="auto internal xref">Section 8.6</a>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+and the implementation measures that bound it, are discussed in <a href="#dos" class="auto internal xref">Section 8.5</a>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1539,7 +1543,7 @@ below).<a href="#section-4.2-4.8.1" class="pilcrow">¶</a></p>
           <dd style="margin-left: 1.5em" id="section-4.2-4.10">
             <p id="section-4.2-4.10.1">The 4-octet AS Number of the delegator, i.e., an AS belonging to the
 holder of the delegated prefix. The delegator signs this attribute with
-the private key of its BGPsec router certificate (<span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>). The
+the private key of its SODA signing certificate. The
 binding between the Delegator-ASN and the prefix, which establishes the
 delegator's authority to delegate origination, is verified as described
 in <a href="#delegator-authority" class="auto internal xref">Section 8.1</a>.<a href="#section-4.2-4.10.1" class="pilcrow">¶</a></p>
@@ -1558,7 +1562,7 @@ in the AS_PATH of the BGP UPDATE carrying this attribute.<a href="#section-4.2-4
 integer representing seconds since the Unix epoch (January 1, 1970,
 00:00:00 UTC). This value indicates the end of the intended delegation
 period, independent of the validity period of any RPKI certificate or
-BGPsec router certificate. Validators <span class="bcp14">MUST</span> compare this field against
+SODA signing certificate. Validators <span class="bcp14">MUST</span> compare this field against
 the current time during SODA evaluation, as specified in <a href="#phase2" class="auto internal xref">Section 6.2</a>.<a href="#section-4.2-4.14.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
@@ -1567,7 +1571,7 @@ the current time during SODA evaluation, as specified in <a href="#phase2" class
             <p id="section-4.2-4.16.1">The length, in octets, of the Signature field. For Sig-Alg-ID 0x01
 (ECDSA P-256), the signature is encoded as a fixed 64-octet value, the
 concatenation of the two 32-octet integers r and s, as specified for
-BGPsec signatures in <span>[<a href="#RFC8608" class="cite xref">RFC8608</a>]</span>.<a href="#section-4.2-4.16.1" class="pilcrow">¶</a></p>
+signatures in <span>[<a href="#RFC8608" class="cite xref">RFC8608</a>]</span>.<a href="#section-4.2-4.16.1" class="pilcrow">¶</a></p>
 </dd>
           <dd class="break"></dd>
 <dt id="section-4.2-4.17">Prefix (variable, 0-16 octets):</dt>
@@ -1586,9 +1590,9 @@ family.<a href="#section-4.2-4.18.1" class="pilcrow">¶</a></p>
           <dd class="break"></dd>
 <dt id="section-4.2-4.19">Signature (variable):</dt>
           <dd style="margin-left: 1.5em" id="section-4.2-4.20">
-            <p id="section-4.2-4.20.1">The digital signature produced by the delegator using the private key
-corresponding to its BGPsec router certificate. The signed data is
-defined in <a href="#signing" class="auto internal xref">Section 4.3</a>.<a href="#section-4.2-4.20.1" class="pilcrow">¶</a></p>
+            <p id="section-4.2-4.20.1">The digital signature produced by the delegator using a dedicated signing
+key for SODA. The corresponding public key <span class="bcp14">MUST</span> be authenticated
+through the RPKI. The signed data is defined in <a href="#signing" class="auto internal xref">Section 4.3</a>.<a href="#section-4.2-4.20.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
 </dl>
@@ -1634,11 +1638,9 @@ signature and prevents version or algorithm substitution.<a href="#section-4.3-3
         </h3>
 <p id="section-5.1-1">A delegator <span class="bcp14">MUST</span> be the holder of the delegated prefix in the RPKI, i.e.,
 the resource holder to whom the prefix is allocated or sub-allocated. The
-delegator's AS and the delegated prefix <span class="bcp14">MUST</span> therefore be covered by a
-common RPKI resource certificate, so that the delegator's authority over
-the prefix can be verified as described in <a href="#delegator-authority" class="auto internal xref">Section 8.1</a>. The
-delegator <span class="bcp14">MUST</span> also hold a BGPsec router certificate for its AS, as
-defined in <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>, whose private key it uses to sign the attribute.
+delegator's authority over the delegated prefix <span class="bcp14">MUST</span> be established through
+a valid RPKI resource certificate covering the prefix. The delegator <span class="bcp14">MUST</span>
+use a dedicated signing key for SODA.
 Authority to delegate origination follows from holding the address space;
 it is distinct from, and stronger than, mere authorization to originate
 the prefix, which a ROA alone conveys.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
@@ -1651,7 +1653,7 @@ MaxLength, and Delegation-Expiry values.<a href="#section-5.1-3.1.1" class="pilc
 </li>
           <li id="section-5.1-3.2">
             <p id="section-5.1-3.2.1">Compute the signature over the Signed-Data as specified in
-<a href="#signing" class="auto internal xref">Section 4.3</a>, using the BGPsec router certificate private key.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
+<a href="#signing" class="auto internal xref">Section 4.3</a>, using the SODA signing private key.<a href="#section-5.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-5.1-3.3">
             <p id="section-5.1-3.3.1">Deliver the signed attribute value to the delegatee via an
@@ -1754,7 +1756,9 @@ the origin AS does not match the ROA. Phase 2 determines whether this
 mismatch is the result of a legitimate delegation. The checks below are
 conjunctive: any failure yields the indicated result and terminates Phase
 2. They <span class="bcp14">MAY</span> be performed in any order; for the performance implications of
-ordering, see <a href="#dos" class="auto internal xref">Section 8.6</a>.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+ordering, see <a href="#dos" class="auto internal xref">Section 8.5</a>. RPKI certificate validation and resource
+authorization checks are performed by an RPKI relying party (RP) or a
+validation component using RP-validated information.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.2-2">
 <li id="section-6.2-2.1">
             <p id="section-6.2-2.1.1">If the UPDATE does not carry a ROUTE_DELEGATION_ATTEST attribute, if
@@ -1764,24 +1768,22 @@ then SODA evaluation cannot be completed: the ROV-Invalid result
 stands and no further SODA processing is performed.<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.2-2.2">
-            <p id="section-6.2-2.2.1">Verify, using the validated RPKI certificate tree, that the
-Delegator-ASN and the announced prefix are covered by a common RPKI
-resource certificate, i.e., that a single resource holder holds both
-the Delegator-ASN (as an AS resource) and the announced prefix (as an
-IP resource). If no such common certificate exists, the result is
+            <p id="section-6.2-2.2.1">Verify that the SODA signing certificate is valid and that its certified
+IP address resources cover the delegated prefix. If the certificate does
+not authorize the delegated prefix, the result is SODA-Invalid.
+If no such common certificate exists, the result is
 SODA-Invalid. This step anchors the delegation to address-space
 holdership: it establishes that the delegator holds the prefix and thus
 has authority to delegate its origination, rather than merely
 permission to originate it (which a ROA conveys and which is not
-sufficient; see <a href="#delegator-authority" class="auto internal xref">Section 8.1</a>). This check requires access to
-RPKI certificate resource information, which is available to a relying
-party with repository access (the same access used in Step 3).<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+sufficient; see <a href="#delegator-authority" class="auto internal xref">Section 8.1</a>). This authorization check is
+performed using resource information validated by an RPKI relying party (RP),
+without requiring the BGP router to inspect the RPKI certificate tree.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.2-2.3">
-            <p id="section-6.2-2.3.1">Using the Delegator-ASN, retrieve the corresponding BGPsec router
-certificate from the RPKI repository, as specified in <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>, and
-extract its public key. If no valid BGPsec router certificate is found
-for the Delegator-ASN, the result is SODA-Invalid.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.2-2.3.1">Identify the corresponding SODA signing certificate using validated RPKI
+information and extract its public key. If no valid SODA signing certificate
+is found for the Delegator-ASN, the result is SODA-Invalid.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.2-2.4">
             <p id="section-6.2-2.4.1">Using the retrieved public key and the algorithm identified by
@@ -1909,12 +1911,11 @@ any AS that a prefix holder had authorized to originate the prefix (for
 example, a transit provider or a previous delegatee) could in turn issue
 SODA attestations naming arbitrary further delegatees, an escalation the
 prefix holder may not have intended.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">For this reason, SODA anchors delegation authority in address-space
-holdership rather than in origination authorization. Step 2 of <a href="#phase2" class="auto internal xref">Section 6.2</a>
-requires the Delegator-ASN and the announced prefix to be covered by a
-common RPKI resource certificate, establishing that a single resource
-holder holds both the AS and the prefix and therefore that the delegator
-is entitled to delegate the prefix's origination.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">For this reason, SODA anchors delegation authority in IP address resource
+holdership rather than in route origination authorization. The delegator's
+authority is established through the IP address resources associated with the
+validated SODA signing certificate, independently of any AS number held
+by the delegator.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="stale-route-window">
@@ -1931,64 +1932,50 @@ configure validators to perform periodic re-evaluation as described in
 promptly upon expiry.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="bgpsec-key-compromise">
-<section id="section-8.3">
-        <h3 id="name-bgpsec-key-compromise">
-<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-bgpsec-key-compromise" class="section-name selfRef">BGPsec Key Compromise</a>
-        </h3>
-<p id="section-8.3-1">If a delegator's BGPsec router certificate private key is compromised, an
-attacker can forge SODA attributes for any prefix held by the same
-resource holder as the delegator's AS, i.e., any prefix covered by a
-common RPKI resource certificate with that AS (see
-<a href="#delegator-authority" class="auto internal xref">Section 8.1</a>). The delegator <span class="bcp14">SHOULD</span> revoke the compromised
-BGPsec router certificate immediately, which will cause all outstanding
-SODA attribute values signed by that key to fail Step 3 of <a href="#phase2" class="auto internal xref">Section 6.2</a>.
-Certificate revocation follows BGPsec key rollover procedures as defined
-in <span>[<a href="#RFC8209" class="cite xref">RFC8209</a>]</span>.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="replay-of-valid-soda-attributes">
-<section id="section-8.4">
+<section id="section-8.3">
         <h3 id="name-replay-of-valid-soda-attrib">
-<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-replay-of-valid-soda-attrib" class="section-name selfRef">Replay of Valid SODA Attributes</a>
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-replay-of-valid-soda-attrib" class="section-name selfRef">Replay of Valid SODA Attributes</a>
         </h3>
-<p id="section-8.4-1">A valid ROUTE_DELEGATION_ATTEST attribute may be replayed by an attacker
+<p id="section-8.3-1">A valid ROUTE_DELEGATION_ATTEST attribute may be replayed by an attacker
 until the Delegation-Expiry timestamp is reached. The prefix-consistency
 check in Step 5 of <a href="#phase2" class="auto internal xref">Section 6.2</a> confines any such replay to the exact
 prefix and length range named in the signed attribute; it cannot be used
-to authorize a different prefix.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
-<p id="section-8.4-2">This document relies on bounded delegation lifetimes to limit replay
+to authorize a different prefix.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<p id="section-8.3-2">This document relies on bounded delegation lifetimes to limit replay
 exposure. Operators are encouraged to use relatively short delegation
-lifetimes and to renew delegations as necessary.<a href="#section-8.4-2" class="pilcrow">¶</a></p>
+lifetimes and to renew delegations as necessary.<a href="#section-8.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="removal">
-<section id="section-8.5">
+<section id="section-8.4">
         <h3 id="name-removal-of-the-attribute">
-<a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-removal-of-the-attribute" class="section-name selfRef">Removal of the Attribute</a>
+<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-removal-of-the-attribute" class="section-name selfRef">Removal of the Attribute</a>
         </h3>
-<p id="section-8.5-1">Because ROUTE_DELEGATION_ATTEST is an optional, transitive attribute, an
+<p id="section-8.4-1">Because ROUTE_DELEGATION_ATTEST is an optional, transitive attribute, an
 on-path adversary on a BGP session can remove it from an UPDATE. Removal
 does not enable a route hijack: without the attribute, the route reverts
 to an ordinary ROV-Invalid result and is rejected by validators applying
 the <span class="bcp14">RECOMMENDED</span> policy in <a href="#outcome" class="auto internal xref">Section 6.3</a>. Removal can, however, cause a
 legitimately delegated route to be rejected. SODA therefore fails safe
 against hijack, but does not protect the availability of a delegated
-route against an adversary able to strip the attribute in transit.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+route against an adversary able to strip the attribute in transit.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="dos">
-<section id="section-8.6">
+<section id="section-8.5">
         <h3 id="name-computational-cost-and-deni">
-<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-computational-cost-and-deni" class="section-name selfRef">Computational Cost and Denial of Service</a>
+<a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-computational-cost-and-deni" class="section-name selfRef">Computational Cost and Denial of Service</a>
         </h3>
-<p id="section-8.6-1">Phase 2 of validation (<a href="#phase2" class="auto internal xref">Section 6.2</a>) performs RPKI certificate-tree lookups
-and a signature verification. Because Phase 2 is reached only for
+<p id="section-8.5-1">Phase 2 of validation (Section 6.2) requires resource authorization checks
+and signature verification. RPKI certificate processing is performed by an
+RP or an associated validation component, without requiring BGP routers
+to access the RPKI certificate tree. Because Phase 2 is reached only for
 ROV-Invalid routes, an adversary can attach a malformed or unverifiable
 ROUTE_DELEGATION_ATTEST attribute to a large number of announcements that
 are already ROV-Invalid, attempting to induce expensive lookups and
-verifications at validators.<a href="#section-8.6-1" class="pilcrow">¶</a></p>
-<p id="section-8.6-2">To bound this cost, and because the Phase 2 checks may be performed in any
+verifications at validators.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+<p id="section-8.5-2">To bound this cost, and because the Phase 2 checks may be performed in any
 order, implementations <span class="bcp14">SHOULD</span> perform the inexpensive checks first: the
 attribute presence, well-formedness, Version, and Sig-Alg-ID checks of
 Step 1; the prefix-consistency check of Step 5; and the Delegatee-ASN
@@ -1998,20 +1985,20 @@ the RPKI lookups of Steps 2 and 3 and the signature verification of Step
 value, so that repeated announcements carrying the same attribute are not
 re-verified, and <span class="bcp14">SHOULD</span> be able to rate-limit Phase 2 processing,
 including on a per-peer basis. These measures keep the additional work
-introduced by SODA bounded even under a flood of crafted attributes.<a href="#section-8.6-2" class="pilcrow">¶</a></p>
+introduced by SODA bounded even under a flood of crafted attributes.<a href="#section-8.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="path-validation">
-<section id="section-8.7">
+<section id="section-8.6">
         <h3 id="name-path-validation">
-<a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-path-validation" class="section-name selfRef">Path Validation</a>
+<a href="#section-8.6" class="section-number selfRef">8.6. </a><a href="#name-path-validation" class="section-name selfRef">Path Validation</a>
         </h3>
-<p id="section-8.7-1">SODA provides attestation of route origin delegation only. It does not
+<p id="section-8.6-1">SODA provides attestation of route origin delegation only. It does not
 validate the AS_PATH beyond checking that the origin AS matches the
 Delegatee-ASN. SODA is orthogonal to and compatible with BGPsec
 <span>[<a href="#RFC8205" class="cite xref">RFC8205</a>]</span> and ASPA <span>[<a href="#I-D.ietf-sidrops-aspa-verification" class="cite xref">I-D.ietf-sidrops-aspa-verification</a>]</span>, which address
 path validity. Operators requiring end-to-end path security <span class="bcp14">SHOULD</span> deploy
-SODA in conjunction with BGPsec or ASPA.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+SODA in conjunction with BGPsec or ASPA.<a href="#section-8.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2151,7 +2138,7 @@ ROUTE_DELEGATION_ATTEST attribute. The registration policy is IETF Review
 <dl class="references">
 <dt id="I-D.ietf-sidrops-aspa-verification">[I-D.ietf-sidrops-aspa-verification]</dt>
         <dd>
-<span class="refAuthor">Azimov, A.</span>, <span class="refAuthor">Bogomazov, E.</span>, <span class="refAuthor">Bush, R.</span>, <span class="refAuthor">Patel, K.</span>, <span class="refAuthor">Snijders, J.</span>, and <span class="refAuthor">K. Sriram</span>, <span class="refTitle">"BGP AS_PATH Verification Based on Autonomous System Provider Authorization (ASPA) Objects"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-sidrops-aspa-verification-25</span>, <time datetime="2026-04-19" class="refDate">19 April 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-verification-25">https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-verification-25</a>&gt;</span>. </dd>
+<span class="refAuthor">Azimov, A.</span>, <span class="refAuthor">Bogomazov, E.</span>, <span class="refAuthor">Bush, R.</span>, <span class="refAuthor">Patel, K.</span>, <span class="refAuthor">Snijders, J.</span>, and <span class="refAuthor">K. Sriram</span>, <span class="refTitle">"BGP AS_PATH Verification Based on Autonomous System Provider Authorization (ASPA) Objects"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-sidrops-aspa-verification-29</span>, <time datetime="2026-10-16" class="refDate">16 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-verification-29">https://datatracker.ietf.org/doc/html/draft-ietf-sidrops-aspa-verification-29</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-sidrops-rpki-prefixlist">[I-D.ietf-sidrops-rpki-prefixlist]</dt>
         <dd>
