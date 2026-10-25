@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-22T04:07:07.521115+00:00",
+  "timestamp": "2026-10-25T04:04:22.985796+00:00",
   "repo": "shenglinwh/bgp-soda",
   "labels": [
     {
@@ -63,7 +63,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2026-06-18T09:07:49Z",
-      "updatedAt": "2026-06-18T09:08:48Z",
+      "updatedAt": "2026-10-23T02:58:33Z",
       "baseRepository": "shenglinwh/bgp-soda",
       "baseRefName": "main",
       "baseRefOid": "23a97ea42edd425d700bfbdd1602e4da585c68cc",
@@ -75,6 +75,34 @@
       "mergedBy": "shenglinwh",
       "mergeCommit": {
         "oid": "3256a6ace205da962188c0062ad2aad783d2f178"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDOS-KrWs8AAAABKN7bZA",
+      "title": "update version 01",
+      "url": "https://github.com/shenglinwh/bgp-soda/pull/2",
+      "state": "MERGED",
+      "author": "shenglinwh",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-10-23T09:25:58Z",
+      "updatedAt": "2026-10-23T09:26:45Z",
+      "baseRepository": "shenglinwh/bgp-soda",
+      "baseRefName": "main",
+      "baseRefOid": "0a39399b23049ba6385ad8bd21528e663703d867",
+      "headRepository": "shenglinwh/bgp-soda",
+      "headRefName": "v01",
+      "headRefOid": "432dab77dd6fbaf9c26a20dfe1289b86d70ae484",
+      "closedAt": "2026-10-23T09:26:44Z",
+      "mergedAt": "2026-10-23T09:26:44Z",
+      "mergedBy": "shenglinwh",
+      "mergeCommit": {
+        "oid": "a5db29b886d9e6a87dbc9f08e2e77ca6abe99244"
       },
       "comments": [],
       "reviews": []
